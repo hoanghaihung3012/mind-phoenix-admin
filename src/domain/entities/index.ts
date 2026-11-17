@@ -143,3 +143,13 @@ export interface AppSettings {
     compactView: boolean;
   };
 }
+
+export interface Contact {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: 'unread' | 'read' | 'replied';
+  createdAt: string;
+}

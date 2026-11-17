@@ -7,6 +7,7 @@ import { OrdersPage } from './presentation/pages/OrdersPage';
 import { ProductsPage } from './presentation/pages/ProductsPage';
 import { LeaderboardPage } from './presentation/pages/LeaderboardPage';
 import { SalesReportPage } from './presentation/pages/SalesReportPage';
+import { ContactsPage } from './presentation/pages/ContactsPage';
 import { MessagesPage } from './presentation/pages/MessagesPage';
 import { SettingsPage } from './presentation/pages/SettingsPage';
 
@@ -37,6 +38,7 @@ const AppContent: React.FC = () => {
       {activeTab === 'products' && <ProductsPage />}
       {activeTab === 'leaderboard' && <LeaderboardPage />}
       {activeTab === 'sales-report' && <SalesReportPage />}
+      {activeTab === 'contacts' && <ContactsPage />}
       {activeTab === 'messages' && <MessagesPage />}
       {activeTab === 'settings' && <SettingsPage />}
     </MainLayout>

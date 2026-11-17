@@ -8,6 +8,7 @@ import {
   MessageThread,
   Message,
   AppSettings,
+  Contact,
 } from '../../domain/entities';
 
 export class ApiDashboardRepository {
@@ -64,5 +65,17 @@ export class ApiSettingsRepository {
   }
   async updateSettings(settings: AppSettings): Promise<AppSettings> {
     return ApiClient.put<AppSettings>('/settings', settings);
+  }
+}
+
+export class ApiContactRepository {
+  async getContacts(): Promise<Contact[]> {
+    return ApiClient.get<Contact[]>('/contacts');
+  }
+  async updateStatus(id: string, status: 'unread' | 'read' | 'replied'): Promise<Contact> {
+    return ApiClient.patch<Contact>(`/contacts/${id}/status`, { status });
+  }
+  async deleteContact(id: string): Promise<{ success: boolean }> {
+    return ApiClient.delete<{ success: boolean }>(`/contacts/${id}`);
   }
 }

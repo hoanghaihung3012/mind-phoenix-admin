@@ -8,6 +8,7 @@ import {
   MessageThread,
   Message,
   AppSettings,
+  Contact,
 } from '../domain/entities';
 import {
   ApiDashboardRepository,
@@ -17,6 +18,7 @@ import {
   ApiSalesReportRepository,
   ApiMessageRepository,
   ApiSettingsRepository,
+  ApiContactRepository,
 } from '../infrastructure/repositories/ApiRepositories';
 
 const dashboardRepo = new ApiDashboardRepository();
@@ -26,6 +28,7 @@ const leaderboardRepo = new ApiLeaderboardRepository();
 const salesReportRepo = new ApiSalesReportRepository();
 const messageRepo = new ApiMessageRepository();
 const settingsRepo = new ApiSettingsRepository();
+const contactRepo = new ApiContactRepository();
 
 export function useDashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -194,4 +197,39 @@ export function useSettings() {
   };
 
   return { settings, loading, updateSettings };
+}
+
+export function useContacts() {
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchContacts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await contactRepo.getContacts();
+      setContacts(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load contacts');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
+
+  const updateStatus = async (id: string, status: 'unread' | 'read' | 'replied') => {
+    const updated = await contactRepo.updateStatus(id, status);
+    setContacts(prev => prev.map(c => (c.id === id ? updated : c)));
+    return updated;
+  };
+
+  const deleteContact = async (id: string) => {
+    await contactRepo.deleteContact(id);
+    setContacts(prev => prev.filter(c => c.id !== id));
+  };
+
+  return { contacts, loading, error, refetch: fetchContacts, updateStatus, deleteContact };
 }
