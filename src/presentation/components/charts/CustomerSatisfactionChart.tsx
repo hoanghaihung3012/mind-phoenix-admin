@@ -1,14 +1,21 @@
 import React from 'react';
 
 interface CustomerSatisfactionProps {
-  data: Array<{
-    month: string;
-    lastMonth: number;
-    thisMonth: number;
-  }>;
+  data?: any;
 }
 
-export const CustomerSatisfactionChart: React.FC<CustomerSatisfactionProps> = ({ data = [] }) => {
+export const CustomerSatisfactionChart: React.FC<CustomerSatisfactionProps> = ({ data }) => {
+  const points: Array<{ label?: string; month?: string; lastMonth: number; thisMonth: number }> =
+    Array.isArray(data)
+      ? data
+      : data?.points || [
+          { label: 'W1', lastMonth: 2200, thisMonth: 3400 },
+          { label: 'W2', lastMonth: 2800, thisMonth: 3100 },
+          { label: 'W3', lastMonth: 2500, thisMonth: 3900 },
+          { label: 'W4', lastMonth: 3100, thisMonth: 4200 },
+          { label: 'W5', lastMonth: 2800, thisMonth: 4504 },
+        ];
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-end gap-5 text-xs font-medium text-[#737791] mb-4">
@@ -64,8 +71,8 @@ export const CustomerSatisfactionChart: React.FC<CustomerSatisfactionProps> = ({
       </div>
 
       <div className="flex justify-between items-center text-[11px] text-[#737791] font-medium pt-2 border-t border-[#EFF1F6]">
-        {data.map((d, i) => (
-          <span key={i}>{d.month}</span>
+        {points.map((d, i) => (
+          <span key={i}>{d.label || d.month || `W${i + 1}`}</span>
         ))}
       </div>
     </div>

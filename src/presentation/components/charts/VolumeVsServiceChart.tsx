@@ -1,15 +1,14 @@
 import React from 'react';
 
 interface VolumeVsServiceProps {
-  data: {
-    volume: number;
-    service: number;
-  };
+  data?: any;
 }
 
-export const VolumeVsServiceChart: React.FC<VolumeVsServiceProps> = ({ data = { volume: 1135, service: 635 } }) => {
-  const total = data.volume + data.service;
-  const volPct = Math.round((data.volume / total) * 100);
+export const VolumeVsServiceChart: React.FC<VolumeVsServiceProps> = ({ data }) => {
+  const volume = Number(data?.volume ?? data?.totalVolume ?? 1135) || 1135;
+  const service = Number(data?.service ?? data?.totalServices ?? 635) || 635;
+  const total = volume + service;
+  const volPct = Math.round((volume / total) * 100);
   const srvPct = 100 - volPct;
 
   return (
@@ -49,14 +48,14 @@ export const VolumeVsServiceChart: React.FC<VolumeVsServiceProps> = ({ data = { 
           <span className="w-2.5 h-2.5 rounded-full bg-[#00E096]" />
           <div>
             <p className="text-[#737791] text-[10px]">Volume</p>
-            <p className="font-bold text-[#151D48]">{data.volume}</p>
+            <p className="font-bold text-[#151D48]">{volume}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#0095FF]" />
           <div>
             <p className="text-[#737791] text-[10px]">Service</p>
-            <p className="font-bold text-[#151D48]">{data.service}</p>
+            <p className="font-bold text-[#151D48]">{service}</p>
           </div>
         </div>
       </div>

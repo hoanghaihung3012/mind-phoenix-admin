@@ -29,7 +29,7 @@ export const WorldSalesMap: React.FC<WorldSalesProps> = ({ data = [] }) => {
           <div key={i} className="flex items-center justify-between text-xs font-semibold text-[#151D48]">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-              <span>{item.country}</span>
+              <span>{item.country || (item as any).name}</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-24 bg-[#EFF1F6] h-1.5 rounded-full overflow-hidden">
