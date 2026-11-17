@@ -26,16 +26,18 @@ export const DashboardPage: React.FC = () => {
     );
   }
 
-  const today = metrics?.todaySales || {
-    totalSales: 1000,
-    salesChange: 0.5,
-    totalOrders: 300,
-    ordersChange: -0.5,
-    productSold: 5,
-    productSoldChange: 1.2,
-    newCustomers: 8,
-    newCustomersChange: 0.5,
-  };
+  const rawMetrics = (metrics?.todaySales as any)?.metrics;
+  const todaySalesVal = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Sales'))?.value || '$1k' : '$1k';
+  const todaySalesChange = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Sales'))?.change || '+8%' : '+8%';
+
+  const totalOrdersVal = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Order'))?.value || '300' : '300';
+  const totalOrdersChange = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Order'))?.change || '+5%' : '+5%';
+
+  const productSoldVal = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Product'))?.value || '5' : '5';
+  const productSoldChange = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Product'))?.change || '+1.2%' : '+1.2%';
+
+  const newCustomersVal = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Customer'))?.value || '8' : '8';
+  const newCustomersChange = rawMetrics ? rawMetrics.find((m: any) => m.title?.includes('Customer'))?.change || '0.5%' : '0.5%';
 
   return (
     <div className="space-y-6">
@@ -53,30 +55,30 @@ export const DashboardPage: React.FC = () => {
           <StatCard
             variant="pink"
             icon={<TrendingUp className="w-5 h-5" />}
-            value={`$${today.totalSales}k`}
+            value={todaySalesVal}
             title="Total Sales"
-            change={`${today.salesChange > 0 ? '+' : ''}${today.salesChange}%`}
+            change={todaySalesChange}
           />
           <StatCard
             variant="orange"
             icon={<ShoppingBag className="w-5 h-5" />}
-            value={today.totalOrders}
+            value={totalOrdersVal}
             title="Total Order"
-            change={`${today.ordersChange > 0 ? '+' : ''}${today.ordersChange}%`}
+            change={totalOrdersChange}
           />
           <StatCard
             variant="green"
             icon={<Tag className="w-5 h-5" />}
-            value={today.productSold}
+            value={productSoldVal}
             title="Product Sold"
-            change={`${today.productSoldChange > 0 ? '+' : ''}${today.productSoldChange}%`}
+            change={productSoldChange}
           />
           <StatCard
             variant="purple"
             icon={<UserPlus className="w-5 h-5" />}
-            value={today.newCustomers}
+            value={newCustomersVal}
             title="New Customers"
-            change={`${today.newCustomersChange > 0 ? '+' : ''}${today.newCustomersChange}%`}
+            change={newCustomersChange}
           />
         </div>
       </Card>
