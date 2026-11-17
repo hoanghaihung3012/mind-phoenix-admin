@@ -83,11 +83,17 @@ export interface LeaderboardUser {
   rank: number;
   name: string;
   avatar: string;
-  role: string;
-  dealsClosed: number;
-  totalRevenue: number;
-  targetAchievement: number;
-  status: 'Top Performer' | 'Achieved' | 'On Track' | 'Needs Attention';
+  level: number;
+  points: number;
+  school?: string;
+  title?: string;
+  streak?: number;
+  status: string;
+  // legacy optional fields for compatibility
+  role?: string;
+  dealsClosed?: number;
+  totalRevenue?: number;
+  targetAchievement?: number;
 }
 
 export interface SalesReportRow {
