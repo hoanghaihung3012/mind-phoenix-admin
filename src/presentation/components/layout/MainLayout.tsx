@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 
@@ -13,12 +13,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   setActiveTab,
   children,
 }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-[#FAFBFC] font-poppins selection:bg-[#5D5FEF] selection:text-white">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar />
-        <main className="p-8 flex-1">{children}</main>
+        <TopBar onOpenMenu={() => setIsSidebarOpen(true)} />
+        <main className="p-4 sm:p-6 lg:p-8 flex-1 w-full overflow-x-hidden">
+          {children}
+        </main>
       </div>
     </div>
   );

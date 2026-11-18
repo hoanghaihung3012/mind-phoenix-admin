@@ -14,17 +14,17 @@ export const VisitorInsightsChart: React.FC<VisitorInsightsProps> = ({ data = []
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-end gap-5 text-xs font-medium text-[#737791] mb-4">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#A700FF]" />
+      <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2.5 sm:gap-5 text-[11px] sm:text-xs font-medium text-[#737791] mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#A700FF] shrink-0" />
           <span>Loyal Customer</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shrink-0" />
           <span>New Customer</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#3CD856]" />
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#3CD856] shrink-0" />
           <span>Unique Visitor</span>
         </div>
       </div>
