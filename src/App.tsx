@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './application/AuthContext';
 import { LoginPage } from './presentation/pages/LoginPage';
 import { MainLayout } from './presentation/components/layout/MainLayout';
 import { DashboardPage } from './presentation/pages/DashboardPage';
+import { AnalyticsPage } from './presentation/pages/AnalyticsPage';
 import { OrdersPage } from './presentation/pages/OrdersPage';
 import { ProductsPage } from './presentation/pages/ProductsPage';
 import { LeaderboardPage } from './presentation/pages/LeaderboardPage';
@@ -32,7 +33,8 @@ const AppContent: React.FC = () => {
 
   return (
     <MainLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {activeTab === 'dashboard' && <DashboardPage />}
+      {activeTab === 'dashboard' && <DashboardPage onNavigateTab={setActiveTab} />}
+      {activeTab === 'analytics' && <AnalyticsPage />}
       {activeTab === 'orders' && <OrdersPage />}
       {activeTab === 'products' && <ProductsPage />}
       {activeTab === 'leaderboard' && <LeaderboardPage />}

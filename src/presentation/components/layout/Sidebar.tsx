@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   LayoutDashboard,
+  Activity,
   Trophy,
   ShoppingCart,
   ShoppingBag,
@@ -31,6 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: 'analytics', label: 'User & Analytics', icon: <Activity className="w-5 h-5" /> },
     { id: 'leaderboard', label: 'Leaderboard', icon: <Trophy className="w-5 h-5" /> },
     { id: 'orders', label: 'Order', icon: <ShoppingCart className="w-5 h-5" /> },
     { id: 'products', label: 'Products', icon: <ShoppingBag className="w-5 h-5" /> },

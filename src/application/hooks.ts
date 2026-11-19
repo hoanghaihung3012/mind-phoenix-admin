@@ -9,6 +9,7 @@ import {
   Message,
   AppSettings,
   Contact,
+  AnalyticsSummary,
 } from '../domain/entities';
 import {
   ApiDashboardRepository,
@@ -19,6 +20,7 @@ import {
   ApiMessageRepository,
   ApiSettingsRepository,
   ApiContactRepository,
+  ApiAnalyticsRepository,
 } from '../infrastructure/repositories/ApiRepositories';
 
 const dashboardRepo = new ApiDashboardRepository();
@@ -29,6 +31,7 @@ const salesReportRepo = new ApiSalesReportRepository();
 const messageRepo = new ApiMessageRepository();
 const settingsRepo = new ApiSettingsRepository();
 const contactRepo = new ApiContactRepository();
+const analyticsRepo = new ApiAnalyticsRepository();
 
 export function useDashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -233,3 +236,31 @@ export function useContacts() {
 
   return { contacts, loading, error, refetch: fetchContacts, updateStatus, deleteContact };
 }
+
+export function useAnalytics(pollInterval = 10000) {
+  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSummary = useCallback(async () => {
+    try {
+      const data = await analyticsRepo.getSummary();
+      setSummary(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load analytics summary');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSummary();
+    if (pollInterval > 0) {
+      const interval = setInterval(fetchSummary, pollInterval);
+      return () => clearInterval(interval);
+    }
+  }, [fetchSummary, pollInterval]);
+
+  return { summary, loading, error, refetch: fetchSummary };
+}
+

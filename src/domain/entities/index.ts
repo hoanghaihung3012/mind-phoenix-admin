@@ -159,3 +159,71 @@ export interface Contact {
   status: 'unread' | 'read' | 'replied';
   createdAt: string;
 }
+
+export interface ClientSession {
+  sessionId: string;
+  userId?: string | null;
+  userName?: string | null;
+  userEmail?: string | null;
+  userAvatar?: string | null;
+  role?: string | null;
+  ip?: string;
+  userAgent?: string;
+  currentPage?: string;
+  currentActivity?: string;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  isOnline?: boolean;
+}
+
+export interface AnalyticsEvent {
+  id: string;
+  sessionId: string;
+  userId?: string | null;
+  userName?: string | null;
+  type: 'game_play' | 'tool_use' | 'score' | 'page_view' | 'interaction';
+  targetId: string;
+  targetTitle: string;
+  score?: number;
+  metadata?: Record<string, any>;
+  createdAt: string;
+}
+
+export interface GameScoreRecord {
+  id: string;
+  gameId: string;
+  gameTitle: string;
+  playerName: string;
+  userId?: string | null;
+  score: number;
+  createdAt: string;
+}
+
+export interface TopGameStat {
+  id: string;
+  title: string;
+  playCount: number;
+  lastPlayedAt: string;
+}
+
+export interface TopToolStat {
+  id: string;
+  title: string;
+  usageCount: number;
+  lastUsedAt: string;
+}
+
+export interface AnalyticsSummary {
+  totalUsers: number;
+  onlineUsers: number;
+  onlineMembers: number;
+  onlineGuests: number;
+  totalGamePlays: number;
+  totalToolUsages: number;
+  topGames: TopGameStat[];
+  topTools: TopToolStat[];
+  topScores: GameScoreRecord[];
+  recentActivities: AnalyticsEvent[];
+  activeSessions: ClientSession[];
+}
+

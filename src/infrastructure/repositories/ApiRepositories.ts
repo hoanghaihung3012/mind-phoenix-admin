@@ -9,6 +9,8 @@ import {
   Message,
   AppSettings,
   Contact,
+  AnalyticsSummary,
+  ClientSession,
 } from '../../domain/entities';
 
 export class ApiDashboardRepository {
@@ -79,3 +81,13 @@ export class ApiContactRepository {
     return ApiClient.delete<{ success: boolean }>(`/contacts/${id}`);
   }
 }
+
+export class ApiAnalyticsRepository {
+  async getSummary(): Promise<AnalyticsSummary> {
+    return ApiClient.get<AnalyticsSummary>('/analytics/summary');
+  }
+  async getOnlineUsers(windowSeconds = 90): Promise<ClientSession[]> {
+    return ApiClient.get<ClientSession[]>(`/analytics/online-users?window=${windowSeconds}`);
+  }
+}
+
