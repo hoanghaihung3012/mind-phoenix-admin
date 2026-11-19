@@ -118,6 +118,7 @@ export interface MessageThread {
   timestamp: string;
   unreadCount: number;
   isOnline: boolean;
+  messages?: Message[];
 }
 
 export interface Message {

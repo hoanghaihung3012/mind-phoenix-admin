@@ -51,13 +51,18 @@ export class ApiSalesReportRepository {
 
 export class ApiMessageRepository {
   async getThreads(): Promise<MessageThread[]> {
-    return ApiClient.get<MessageThread[]>('/messages/threads');
+    const data = await ApiClient.get<MessageThread[]>('/messages');
+    return Array.isArray(data) ? data : [];
   }
   async getMessages(threadId: string): Promise<Message[]> {
-    return ApiClient.get<Message[]>(`/messages/${threadId}`);
+    const res = await ApiClient.get<any>(`/messages/${threadId}`);
+    return res?.messages || [];
   }
-  async sendMessage(threadId: string, content: string): Promise<Message> {
-    return ApiClient.post<Message>(`/messages/${threadId}`, { content });
+  async sendMessage(threadId: string, content: string): Promise<MessageThread> {
+    return ApiClient.post<MessageThread>(`/messages/${threadId}`, { content });
+  }
+  async deleteThread(threadId: string): Promise<{ success: boolean }> {
+    return ApiClient.delete<{ success: boolean }>(`/messages/${threadId}`);
   }
 }
 

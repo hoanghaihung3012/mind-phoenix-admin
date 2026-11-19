@@ -153,24 +153,73 @@ export function useMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    messageRepo.getThreads()
-      .then(data => {
-        setThreads(data);
-        if (data.length > 0) setActiveThreadId(data[0].id);
-      })
-      .finally(() => setLoading(false));
+  const fetchThreads = useCallback(async () => {
+    try {
+      const data = await messageRepo.getThreads();
+      setThreads(data);
+      if (data.length > 0 && !activeThreadId) {
+        setActiveThreadId(data[0].id);
+      }
+    } catch {
+      // Ignored
+    } finally {
+      setLoading(false);
+    }
+  }, [activeThreadId]);
+
+  const fetchMessages = useCallback(async (threadId: string) => {
+    if (!threadId) return;
+    try {
+      const list = await messageRepo.getMessages(threadId);
+      setMessages(list);
+    } catch {
+      // Ignored
+    }
   }, []);
 
+  // Initial load
   useEffect(() => {
-    if (!activeThreadId) return;
-    messageRepo.getMessages(activeThreadId).then(setMessages);
-  }, [activeThreadId]);
+    fetchThreads();
+  }, [fetchThreads]);
+
+  // Load messages when activeThreadId changes
+  useEffect(() => {
+    if (activeThreadId) {
+      fetchMessages(activeThreadId);
+    }
+  }, [activeThreadId, fetchMessages]);
+
+  // Poll for new messages every 4s
+  useEffect(() => {
+    const timer = setInterval(() => {
+      fetchThreads();
+      if (activeThreadId) {
+        fetchMessages(activeThreadId);
+      }
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [fetchThreads, fetchMessages, activeThreadId]);
 
   const sendMessage = async (content: string) => {
     if (!activeThreadId || !content.trim()) return;
-    const msg = await messageRepo.sendMessage(activeThreadId, content);
-    setMessages(prev => [...prev, msg]);
+    try {
+      const updated = await messageRepo.sendMessage(activeThreadId, content.trim());
+      if (updated?.messages) {
+        setMessages(updated.messages);
+      }
+      fetchThreads();
+    } catch (err: any) {
+      console.warn('Failed to send message:', err.message);
+    }
+  };
+
+  const deleteThread = async (id: string) => {
+    await messageRepo.deleteThread(id);
+    setThreads(prev => prev.filter(t => t.id !== id));
+    if (activeThreadId === id) {
+      setActiveThreadId('');
+      setMessages([]);
+    }
   };
 
   return {
@@ -180,6 +229,8 @@ export function useMessages() {
     messages,
     loading,
     sendMessage,
+    deleteThread,
+    refetch: fetchThreads,
   };
 }
 
