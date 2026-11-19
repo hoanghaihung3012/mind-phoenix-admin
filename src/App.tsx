@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './application/AuthContext';
+import { LanguageProvider } from './application/LanguageContext';
 import { LoginPage } from './presentation/pages/LoginPage';
 import { MainLayout } from './presentation/components/layout/MainLayout';
 import { DashboardPage } from './presentation/pages/DashboardPage';
@@ -48,7 +49,9 @@ const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
     </AuthProvider>
   );
 };

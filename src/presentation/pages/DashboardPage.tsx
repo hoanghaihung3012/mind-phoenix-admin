@@ -8,11 +8,11 @@ import {
   Users,
   Activity,
   Gamepad2,
-  Wrench,
   Trophy,
   ArrowRight,
 } from 'lucide-react';
 import { useDashboard, useAnalytics } from '../../application/hooks';
+import { useLanguage } from '../../application/LanguageContext';
 import { Card, StatCard, Button, ProgressBar } from '../components/ui';
 import { VisitorInsightsChart } from '../components/charts/VisitorInsightsChart';
 import { TotalRevenueChart } from '../components/charts/TotalRevenueChart';
@@ -28,11 +28,12 @@ interface DashboardPageProps {
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) => {
   const { metrics, loading } = useDashboard();
   const { summary } = useAnalytics(10000);
+  const { t, language } = useLanguage();
 
   if (loading && !metrics) {
     return (
       <div className="flex items-center justify-center h-96 text-sm text-[#737791]">
-        Đang tải dữ liệu dashboard...
+        {t('loading')}
       </div>
     );
   }
@@ -60,18 +61,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
           <div className="flex items-center gap-2">
             <span className="bg-white/20 px-2 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Real-time Client Pulse
+              {t('clientPulse')}
             </span>
-            <span className="text-white/80 text-xs">· Hoạt động người dùng trên mindphoenix.xyz</span>
+            <span className="text-white/80 text-xs">· {t('pulseSubtitle')}</span>
           </div>
-          <h2 className="text-lg font-bold">Giám sát Người Dùng & Tương Tác Trực Tuyến</h2>
+          <h2 className="text-lg font-bold">{t('pulseTitle')}</h2>
         </div>
 
         <div className="flex flex-wrap items-center gap-4 text-xs">
           <div className="bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl flex items-center gap-2.5 border border-white/10">
             <Users className="w-4 h-4 text-purple-200" />
             <div>
-              <div className="text-[10px] text-white/70">Tổng tài khoản</div>
+              <div className="text-[10px] text-white/70">{t('totalUsersStat')}</div>
               <div className="text-sm font-bold">{summary?.totalUsers || 0} user</div>
             </div>
           </div>
@@ -79,7 +80,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
           <div className="bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl flex items-center gap-2.5 border border-white/10">
             <Activity className="w-4 h-4 text-emerald-300" />
             <div>
-              <div className="text-[10px] text-white/70">Đang Online</div>
+              <div className="text-[10px] text-white/70">{t('onlineUsersStat')}</div>
               <div className="text-sm font-bold flex items-center gap-1">
                 <span className="text-emerald-300">●</span> {summary?.onlineUsers || 0} online
               </div>
@@ -89,8 +90,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
           <div className="bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl flex items-center gap-2.5 border border-white/10">
             <Gamepad2 className="w-4 h-4 text-amber-300" />
             <div>
-              <div className="text-[10px] text-white/70">Lượt chơi Game</div>
-              <div className="text-sm font-bold">{summary?.totalGamePlays || 0} lượt</div>
+              <div className="text-[10px] text-white/70">{t('gamePlaysStat')}</div>
+              <div className="text-sm font-bold">{summary?.totalGamePlays || 0} {language === 'vi' ? 'lượt' : 'plays'}</div>
             </div>
           </div>
 
@@ -99,7 +100,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
               onClick={() => onNavigateTab('analytics')}
               className="bg-white text-[#5D5FEF] font-bold px-4 py-2 rounded-xl shadow-md hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-xs shrink-0 cursor-pointer"
             >
-              Xem Analytics
+              {t('viewAnalyticsBtn')}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
@@ -108,11 +109,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
 
       {/* Today's Sales Section */}
       <Card
-        title="Today's Sales"
-        subtitle="Sales Summary"
+        title={t('todaySales')}
+        subtitle={t('salesSummary')}
         action={
           <Button variant="export" icon={<Download className="w-4 h-4 text-[#737791]" />}>
-            Export
+            {t('export')}
           </Button>
         }
       >
@@ -121,28 +122,28 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
             variant="pink"
             icon={<TrendingUp className="w-5 h-5" />}
             value={todaySalesVal}
-            title="Total Sales"
+            title={t('totalSales')}
             change={todaySalesChange}
           />
           <StatCard
             variant="orange"
             icon={<ShoppingBag className="w-5 h-5" />}
             value={totalOrdersVal}
-            title="Total Order"
+            title={t('totalOrders')}
             change={totalOrdersChange}
           />
           <StatCard
             variant="green"
             icon={<Tag className="w-5 h-5" />}
             value={productSoldVal}
-            title="Product Sold"
+            title={t('productSold')}
             change={productSoldChange}
           />
           <StatCard
             variant="purple"
             icon={<UserPlus className="w-5 h-5" />}
             value={newCustomersVal}
-            title="New Customers"
+            title={t('newCustomers')}
             change={newCustomersChange}
           />
         </div>
@@ -152,15 +153,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Top Games Preview */}
         <Card
-          title="Top Game Được Chơi Nhiều"
-          subtitle="Tương tác minigame giáo dục học sinh"
+          title={t('topPlayedGames')}
+          subtitle={t('minigameSubtitle')}
           action={
             onNavigateTab && (
               <button
                 onClick={() => onNavigateTab('analytics')}
                 className="text-xs text-[#5D5FEF] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
               >
-                Chi tiết <ArrowRight className="w-3 h-3" />
+                {t('viewDetails')} <ArrowRight className="w-3 h-3" />
               </button>
             )
           }
@@ -177,7 +178,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
                     <span className="font-semibold text-[#151D48]">
                       #{idx + 1} {game.title}
                     </span>
-                    <span className="text-[#737791] font-medium">{game.playCount} lượt</span>
+                    <span className="text-[#737791] font-medium">{game.playCount} {language === 'vi' ? 'lượt' : 'plays'}</span>
                   </div>
                   <ProgressBar value={pct} color={color} height="h-1.5" />
                 </div>
@@ -188,15 +189,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
 
         {/* Top Tools Preview */}
         <Card
-          title="Top Công Cụ Trợ Giảng"
-          subtitle="Tương tác tiện ích & sandbox"
+          title={t('topTools')}
+          subtitle={t('toolSubtitle')}
           action={
             onNavigateTab && (
               <button
                 onClick={() => onNavigateTab('analytics')}
                 className="text-xs text-[#5D5FEF] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
               >
-                Chi tiết <ArrowRight className="w-3 h-3" />
+                {t('viewDetails')} <ArrowRight className="w-3 h-3" />
               </button>
             )
           }
@@ -214,7 +215,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
                     <span className="font-semibold text-[#151D48]">
                       #{idx + 1} {tool.title}
                     </span>
-                    <span className="text-[#737791] font-medium">{tool.usageCount} lần</span>
+                    <span className="text-[#737791] font-medium">{tool.usageCount} {language === 'vi' ? 'lần' : 'times'}</span>
                   </div>
                   <ProgressBar value={pct} color={color} height="h-1.5" />
                 </div>
@@ -225,8 +226,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
 
         {/* Top High Scores Preview */}
         <Card
-          title="Bảng Vàng Điểm Cao"
-          subtitle="Top kỷ lục điểm game client"
+          title={t('topScores')}
+          subtitle={t('scoreSubtitle')}
           action={
             <div className="flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
               <Trophy className="w-3 h-3" /> Top Rank
@@ -249,7 +250,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
                   </div>
                 </div>
                 <div className="font-bold text-emerald-600 text-xs">
-                  {item.score.toLocaleString()} đ
+                  {item.score.toLocaleString()} {language === 'vi' ? 'đ' : 'pts'}
                 </div>
               </div>
             ))}
@@ -259,34 +260,34 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
 
       {/* Row 2: Visitor Insights & Total Revenue */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card title="Visitor Insights">
+        <Card title={t('visitorInsights')}>
           <VisitorInsightsChart data={metrics?.visitorInsights} />
         </Card>
-        <Card title="Total Revenue">
+        <Card title={t('totalRevenue')}>
           <TotalRevenueChart data={metrics?.totalRevenue} />
         </Card>
       </div>
 
       {/* Row 3: Customer Satisfaction & Target vs Reality */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card title="Customer Satisfaction">
+        <Card title={t('customerSatisfaction')}>
           <CustomerSatisfactionChart data={metrics?.customerSatisfaction} />
         </Card>
-        <Card title="Target vs Reality">
+        <Card title={t('targetVsReality')}>
           <TargetVsRealityChart data={metrics?.targetVsReality} />
         </Card>
       </div>
 
       {/* Row 4: Top Products, World Sales & Volume vs Service */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card title="Top Products">
+        <Card title={t('topProducts')}>
           <div className="space-y-4 mt-2">
             {(metrics?.topProducts || []).map(p => (
               <div key={p.id} className="flex items-center justify-between">
                 <div className="flex-1 pr-4">
                   <div className="flex justify-between items-center text-xs font-semibold text-[#151D48] mb-1.5">
                     <span>{p.name}</span>
-                    <span className="text-[#737791] font-normal">{p.salesCount} sales</span>
+                    <span className="text-[#737791] font-normal">{p.salesCount} {language === 'vi' ? 'đã bán' : 'sales'}</span>
                   </div>
                   <ProgressBar value={p.popularity} color={p.color} height="h-1.5" />
                 </div>
@@ -301,11 +302,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab }) =
           </div>
         </Card>
 
-        <Card title="Sales Mapping by Country">
+        <Card title={t('salesMapping')}>
           <WorldSalesMap data={metrics?.worldSalesMap} />
         </Card>
 
-        <Card title="Volume vs Service Level">
+        <Card title={t('volumeVsService')}>
           <VolumeVsServiceChart data={metrics?.volumeVsService || { volume: 1135, service: 635 }} />
         </Card>
       </div>

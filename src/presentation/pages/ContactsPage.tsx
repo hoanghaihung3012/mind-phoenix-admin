@@ -11,16 +11,17 @@ import {
   Trash2,
   RefreshCw,
   Clock,
-  Sparkles,
   Copy,
   Check,
 } from 'lucide-react';
 import { useContacts } from '../../application/hooks';
+import { useLanguage } from '../../application/LanguageContext';
 import { Card, Button, Badge, Modal } from '../components/ui';
 import { Contact } from '../../domain/entities';
 
 export const ContactsPage: React.FC = () => {
   const { contacts, loading, refetch, updateStatus, deleteContact } = useContacts();
+  const { t, language } = useLanguage();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'unread' | 'read' | 'replied'>('all');
@@ -58,7 +59,7 @@ export const ContactsPage: React.FC = () => {
   const formatDate = (isoString: string) => {
     try {
       const date = new Date(isoString);
-      return date.toLocaleString('vi-VN', {
+      return date.toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -73,11 +74,11 @@ export const ContactsPage: React.FC = () => {
   const getStatusBadge = (status: Contact['status']) => {
     switch (status) {
       case 'unread':
-        return <Badge variant="warning">Chưa đọc</Badge>;
+        return <Badge variant="warning">{t('statusUnread')}</Badge>;
       case 'read':
-        return <Badge variant="info">Đã xem</Badge>;
+        return <Badge variant="info">{t('statusRead')}</Badge>;
       case 'replied':
-        return <Badge variant="success">Đã liên hệ</Badge>;
+        return <Badge variant="success">{t('statusReplied')}</Badge>;
       default:
         return <Badge variant="neutral">{status}</Badge>;
     }
@@ -100,7 +101,10 @@ export const ContactsPage: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa liên hệ này không?')) {
+    const confirmMsg = language === 'vi'
+      ? 'Bạn có chắc chắn muốn xóa liên hệ này không?'
+      : 'Are you sure you want to delete this contact?';
+    if (window.confirm(confirmMsg)) {
       setDeletingId(id);
       try {
         await deleteContact(id);
@@ -120,14 +124,14 @@ export const ContactsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-[#151D48] tracking-tight">
-              Quản lý thông tin liên hệ khách gửi
+              {t('contactsTitle')}
             </h1>
             <span className="bg-[#5D5FEF]/10 text-[#5D5FEF] font-semibold text-xs px-2.5 py-0.5 rounded-full">
-              {totalCount} yêu cầu
+              {totalCount} {language === 'vi' ? 'yêu cầu' : 'inquiries'}
             </span>
           </div>
           <p className="text-xs text-[#737791] mt-1">
-            Xem và xử lý thông tin liên hệ (Tên, Email, Số điện thoại, Lời nhắn) khách gửi qua Contact Us
+            {t('contactsSub')}
           </p>
         </div>
 
@@ -137,7 +141,7 @@ export const ContactsPage: React.FC = () => {
           onClick={() => refetch()}
           icon={<RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />}
         >
-          Làm mới
+          {t('refresh')}
         </Button>
       </div>
 
@@ -145,7 +149,9 @@ export const ContactsPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-[#F8F9FA] shadow-[0px_4px_20px_rgba(238,238,238,0.5)] flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-[#737791]">Tổng liên hệ nhận được</div>
+            <div className="text-xs font-semibold text-[#737791]">
+              {language === 'vi' ? 'Tổng liên hệ nhận được' : 'Total Inquiries'}
+            </div>
             <div className="text-2xl font-bold text-[#151D48] mt-1">{totalCount}</div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#5D5FEF]/10 text-[#5D5FEF] flex items-center justify-center">
@@ -155,7 +161,9 @@ export const ContactsPage: React.FC = () => {
 
         <div className="bg-white rounded-2xl p-5 border border-[#F8F9FA] shadow-[0px_4px_20px_rgba(238,238,238,0.5)] flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-[#FFA800]">Chưa xử lý (Mới)</div>
+            <div className="text-xs font-semibold text-[#FFA800]">
+              {language === 'vi' ? 'Chưa xử lý (Mới)' : 'Unprocessed (New)'}
+            </div>
             <div className="text-2xl font-bold text-[#FFA800] mt-1">{unreadCount}</div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#FFF4DE] text-[#FFA800] flex items-center justify-center">
@@ -165,7 +173,9 @@ export const ContactsPage: React.FC = () => {
 
         <div className="bg-white rounded-2xl p-5 border border-[#F8F9FA] shadow-[0px_4px_20px_rgba(238,238,238,0.5)] flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-[#3CD856]">Đã liên hệ phản hồi</div>
+            <div className="text-xs font-semibold text-[#3CD856]">
+              {language === 'vi' ? 'Đã liên hệ phản hồi' : 'Replied & Handled'}
+            </div>
             <div className="text-2xl font-bold text-[#3CD856] mt-1">{repliedCount}</div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#E6FBF2] text-[#3CD856] flex items-center justify-center">
@@ -182,7 +192,7 @@ export const ContactsPage: React.FC = () => {
             <Search className="w-4 h-4 text-[#737791] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên, email, số điện thoại, nội dung..."
+              placeholder={t('searchContactPlaceholder')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full bg-[#F9FAFB] border border-[#EFF1F6] rounded-2xl pl-10 pr-4 py-2 text-xs text-[#151D48] placeholder:text-[#A0A4B8] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#5D5FEF]/30 focus:border-[#5D5FEF] transition-all"
@@ -192,10 +202,10 @@ export const ContactsPage: React.FC = () => {
           {/* Filter pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
             {[
-              { id: 'all', label: 'Tất cả', count: totalCount },
-              { id: 'unread', label: 'Chưa đọc', count: unreadCount },
-              { id: 'read', label: 'Đã xem', count: readCount },
-              { id: 'replied', label: 'Đã liên hệ', count: repliedCount },
+              { id: 'all', label: t('statusAll'), count: totalCount },
+              { id: 'unread', label: t('statusUnread'), count: unreadCount },
+              { id: 'read', label: t('statusRead'), count: readCount },
+              { id: 'replied', label: t('statusReplied'), count: repliedCount },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -227,18 +237,20 @@ export const ContactsPage: React.FC = () => {
         {loading && contacts.length === 0 ? (
           <div className="py-16 text-center text-xs text-[#737791]">
             <div className="w-8 h-8 border-3 border-[#5D5FEF] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <span>Đang tải danh sách liên hệ...</span>
+            <span>{t('loading')}</span>
           </div>
         ) : filteredContacts.length === 0 ? (
           <div className="py-16 text-center">
             <div className="w-16 h-16 rounded-3xl bg-[#F9FAFB] flex items-center justify-center text-[#A0A4B8] mx-auto mb-3">
               <Inbox className="w-8 h-8" />
             </div>
-            <h3 className="text-sm font-bold text-[#151D48]">Không có thông tin liên hệ nào</h3>
+            <h3 className="text-sm font-bold text-[#151D48]">
+              {language === 'vi' ? 'Không có thông tin liên hệ nào' : 'No Inquiries Found'}
+            </h3>
             <p className="text-xs text-[#737791] mt-1 max-w-sm mx-auto">
               {searchTerm || statusFilter !== 'all'
-                ? 'Không tìm thấy kết quả phù hợp với điều kiện tìm kiếm và bộ lọc của bạn.'
-                : 'Chưa có khách hàng nào gửi thông tin liên hệ qua website.'}
+                ? (language === 'vi' ? 'Không tìm thấy kết quả phù hợp với điều kiện tìm kiếm và bộ lọc của bạn.' : 'No results matching your filters.')
+                : (language === 'vi' ? 'Chưa có khách hàng nào gửi thông tin liên hệ qua website.' : 'No customer messages submitted yet.')}
             </p>
           </div>
         ) : (
@@ -246,13 +258,13 @@ export const ContactsPage: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[#F8F9FA] text-[11px] font-bold text-[#A0A4B8] uppercase tracking-wider">
-                  <th className="pb-3.5 pr-4">Khách hàng</th>
+                  <th className="pb-3.5 pr-4">{t('colContactSender')}</th>
                   <th className="pb-3.5 px-4">Email</th>
-                  <th className="pb-3.5 px-4">Số điện thoại</th>
-                  <th className="pb-3.5 px-4">Nội dung liên hệ</th>
-                  <th className="pb-3.5 px-4">Thời gian</th>
-                  <th className="pb-3.5 px-4">Trạng thái</th>
-                  <th className="pb-3.5 pl-4 text-right">Thao tác</th>
+                  <th className="pb-3.5 px-4">{language === 'vi' ? 'Số điện thoại' : 'Phone'}</th>
+                  <th className="pb-3.5 px-4">{t('colMessageSnippet')}</th>
+                  <th className="pb-3.5 px-4">{t('colReceivedAt')}</th>
+                  <th className="pb-3.5 px-4">{t('colStatus')}</th>
+                  <th className="pb-3.5 pl-4 text-right">{t('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F8F9FA]">
@@ -277,7 +289,7 @@ export const ContactsPage: React.FC = () => {
                             <div className="font-bold text-[#151D48] flex items-center gap-1.5">
                               <span>{contact.name}</span>
                               {contact.status === 'unread' && (
-                                <span className="w-2 h-2 rounded-full bg-[#FA5A7D] shrink-0" title="Chưa đọc" />
+                                <span className="w-2 h-2 rounded-full bg-[#FA5A7D] shrink-0" title={t('statusUnread')} />
                               )}
                             </div>
                             <div className="text-[11px] text-[#737791] font-mono">
@@ -300,7 +312,7 @@ export const ContactsPage: React.FC = () => {
                             type="button"
                             onClick={() => handleCopy(contact.email, `email-${contact.id}`)}
                             className="text-gray-400 hover:text-gray-600 p-1 rounded"
-                            title="Sao chép email"
+                            title="Copy Email"
                           >
                             {copiedField === `email-${contact.id}` ? (
                               <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -324,7 +336,7 @@ export const ContactsPage: React.FC = () => {
                             type="button"
                             onClick={() => handleCopy(contact.phone, `phone-${contact.id}`)}
                             className="text-gray-400 hover:text-gray-600 p-1 rounded"
-                            title="Sao chép số điện thoại"
+                            title="Copy Phone"
                           >
                             {copiedField === `phone-${contact.id}` ? (
                               <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -362,9 +374,9 @@ export const ContactsPage: React.FC = () => {
                               : 'bg-blue-50 text-blue-600 border-blue-200'
                           }`}
                         >
-                          <option value="unread">Chưa đọc</option>
-                          <option value="read">Đã xem</option>
-                          <option value="replied">Đã liên hệ</option>
+                          <option value="unread">{t('statusUnread')}</option>
+                          <option value="read">{t('statusRead')}</option>
+                          <option value="replied">{t('statusReplied')}</option>
                         </select>
                       </td>
 
@@ -380,17 +392,17 @@ export const ContactsPage: React.FC = () => {
                                 updateStatus(contact.id, 'read');
                               }
                             }}
-                            title="Xem chi tiết"
+                            title="View"
                             icon={<Eye className="w-3.5 h-3.5" />}
                           >
-                            Xem
+                            {language === 'vi' ? 'Xem' : 'View'}
                           </Button>
                           <button
                             type="button"
                             onClick={() => handleDelete(contact.id)}
                             disabled={deletingId === contact.id}
                             className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50"
-                            title="Xóa liên hệ"
+                            title={t('delete')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -410,7 +422,7 @@ export const ContactsPage: React.FC = () => {
         <Modal
           isOpen={!!selectedContact}
           onClose={() => setSelectedContact(null)}
-          title="Chi tiết thông tin liên hệ của khách hàng"
+          title={t('detailModalTitle')}
         >
           <div className="space-y-5 text-xs">
             {/* Top info card */}
@@ -429,7 +441,7 @@ export const ContactsPage: React.FC = () => {
                   </h3>
                   <div className="text-[11px] text-[#737791] flex items-center gap-1.5 mt-0.5">
                     <Calendar className="w-3.5 h-3.5 text-[#5D5FEF]" />
-                    <span>Gửi lúc: {formatDate(selectedContact.createdAt)}</span>
+                    <span>{language === 'vi' ? 'Gửi lúc:' : 'Sent at:'} {formatDate(selectedContact.createdAt)}</span>
                   </div>
                 </div>
               </div>
@@ -441,7 +453,7 @@ export const ContactsPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="p-3.5 rounded-xl border border-[#EFF1F6] bg-white">
                 <span className="text-[10px] uppercase font-bold text-[#A0A4B8] tracking-wider block mb-1">
-                  Địa chỉ Email
+                  Email
                 </span>
                 <div className="flex items-center justify-between">
                   <a
@@ -466,7 +478,7 @@ export const ContactsPage: React.FC = () => {
 
               <div className="p-3.5 rounded-xl border border-[#EFF1F6] bg-white">
                 <span className="text-[10px] uppercase font-bold text-[#A0A4B8] tracking-wider block mb-1">
-                  Số điện thoại
+                  {language === 'vi' ? 'Số điện thoại' : 'Phone'}
                 </span>
                 <div className="flex items-center justify-between">
                   <a
@@ -494,7 +506,7 @@ export const ContactsPage: React.FC = () => {
             <div>
               <label className="text-[11px] font-bold text-[#151D48] flex items-center gap-1.5 mb-2">
                 <MessageSquare className="w-3.5 h-3.5 text-[#5D5FEF]" />
-                <span>Nội dung tin nhắn khách gửi:</span>
+                <span>{language === 'vi' ? 'Nội dung tin nhắn khách gửi:' : 'Message Content:'}</span>
               </label>
               <div className="p-4 rounded-2xl bg-[#F9FAFB] border border-[#EFF1F6] text-[#151D48] leading-relaxed whitespace-pre-wrap font-sans">
                 {selectedContact.message}
@@ -505,7 +517,7 @@ export const ContactsPage: React.FC = () => {
             <div className="pt-2 border-t border-[#F8F9FA] flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-[#737791] font-semibold">
-                  Cập nhật trạng thái:
+                  {language === 'vi' ? 'Cập nhật trạng thái:' : 'Update Status:'}
                 </span>
                 <select
                   value={selectedContact.status}
@@ -516,9 +528,9 @@ export const ContactsPage: React.FC = () => {
                   }}
                   className="text-xs font-semibold rounded-xl px-3 py-1.5 border border-[#EFF1F6] bg-white text-[#151D48] outline-none"
                 >
-                  <option value="unread">Chưa đọc</option>
-                  <option value="read">Đã xem</option>
-                  <option value="replied">Đã liên hệ</option>
+                  <option value="unread">{t('statusUnread')}</option>
+                  <option value="read">{t('statusRead')}</option>
+                  <option value="replied">{t('statusReplied')}</option>
                 </select>
               </div>
 
@@ -529,7 +541,7 @@ export const ContactsPage: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#EFF1F6] text-[#151D48] hover:bg-gray-50 font-semibold"
                 >
                   <Phone className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Gọi ngay</span>
+                  <span>{language === 'vi' ? 'Gọi ngay' : 'Call'}</span>
                 </a>
                 <a
                   href={`mailto:${selectedContact.email}?subject=Phản hồi liên hệ từ Mind Phoenix&body=Chào ${encodeURIComponent(
@@ -542,7 +554,7 @@ export const ContactsPage: React.FC = () => {
                   }}
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>Gửi Email phản hồi</span>
+                  <span>{language === 'vi' ? 'Gửi Email phản hồi' : 'Reply by Email'}</span>
                 </a>
               </div>
             </div>

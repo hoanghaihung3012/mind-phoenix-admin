@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useOrders } from '../../application/hooks';
+import { useLanguage } from '../../application/LanguageContext';
 import { Card, Button, Table, Badge, Avatar, Modal, Input, Select } from '../components/ui';
 import { Order } from '../../domain/entities';
 
 export const OrdersPage: React.FC = () => {
   const { orders, loading, addOrder } = useOrders();
+  const { t, language } = useLanguage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState({
     customerName: '',
@@ -36,13 +38,13 @@ export const OrdersPage: React.FC = () => {
   const getStatusBadge = (status: Order['status']) => {
     switch (status) {
       case 'Completed':
-        return <Badge variant="success">Completed</Badge>;
+        return <Badge variant="success">{t('completed')}</Badge>;
       case 'Processing':
-        return <Badge variant="info">Processing</Badge>;
+        return <Badge variant="info">{t('processing')}</Badge>;
       case 'Pending':
-        return <Badge variant="warning">Pending</Badge>;
+        return <Badge variant="warning">{t('pending')}</Badge>;
       case 'Cancelled':
-        return <Badge variant="danger">Cancelled</Badge>;
+        return <Badge variant="danger">{t('cancelled')}</Badge>;
       default:
         return <Badge variant="neutral">{status}</Badge>;
     }
@@ -50,13 +52,13 @@ export const OrdersPage: React.FC = () => {
 
   const columns = [
     {
-      header: 'Order',
+      header: t('colOrderCode'),
       accessor: (row: Order) => (
         <span className="font-bold text-[#5D5FEF]">{row.orderNumber}</span>
       ),
     },
     {
-      header: 'Customer',
+      header: t('colCustomer'),
       accessor: (row: Order) => (
         <div className="flex items-center gap-3">
           <Avatar src={row.avatar} name={row.customerName} size="sm" />
@@ -68,27 +70,27 @@ export const OrdersPage: React.FC = () => {
       ),
     },
     {
-      header: 'Items',
-      accessor: (row: Order) => `${row.itemsCount} items`,
+      header: t('colItems'),
+      accessor: (row: Order) => `${row.itemsCount} ${language === 'vi' ? 'sản phẩm' : 'items'}`,
     },
     {
-      header: 'Total Amount',
+      header: t('colTotal'),
       accessor: (row: Order) => (
         <span className="font-bold text-[#151D48]">${row.totalAmount.toFixed(2)}</span>
       ),
     },
     {
-      header: 'Status',
+      header: t('status'),
       accessor: (row: Order) => getStatusBadge(row.status),
     },
     {
-      header: 'Payment',
+      header: t('colPaymentMethod'),
       accessor: (row: Order) => (
         <span className="text-xs text-[#737791]">{row.paymentMethod}</span>
       ),
     },
     {
-      header: 'Date',
+      header: t('colDate'),
       accessor: (row: Order) => (
         <span className="text-xs text-[#737791]">{row.createdAt}</span>
       ),
@@ -98,36 +100,36 @@ export const OrdersPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <Card
-        title="Order Management"
-        subtitle={`Total ${orders.length} orders recorded in PostgreSQL database`}
+        title={t('ordersTitle')}
+        subtitle={`${orders.length} ${t('ordersSub')}`}
         action={
           <Button
             variant="primary"
             icon={<Plus className="w-4 h-4" />}
             onClick={() => setIsModalOpen(true)}
           >
-            Create Order
+            {t('addOrderBtn')}
           </Button>
         }
       >
         {loading && orders.length === 0 ? (
-          <div className="py-12 text-center text-sm text-[#737791]">Đang tải danh sách đơn hàng...</div>
+          <div className="py-12 text-center text-sm text-[#737791]">{t('loading')}</div>
         ) : (
           <Table columns={columns} data={orders} keyExtractor={o => o.id} />
         )}
       </Card>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Order">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t('modalAddOrder')}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Customer Name"
+            label={t('customerNameLabel')}
             placeholder="Nguyen Van A"
             value={form.customerName}
             onChange={e => setForm({ ...form, customerName: e.target.value })}
             required
           />
           <Input
-            label="Customer Email"
+            label={t('customerEmailLabel')}
             type="email"
             placeholder="a@gmail.com"
             value={form.customerEmail}
@@ -136,7 +138,7 @@ export const OrdersPage: React.FC = () => {
           />
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Total Amount ($)"
+              label={t('totalAmountLabel')}
               type="number"
               step="0.01"
               placeholder="120.00"
@@ -145,7 +147,7 @@ export const OrdersPage: React.FC = () => {
               required
             />
             <Input
-              label="Items Count"
+              label={t('colItems')}
               type="number"
               min="1"
               value={form.itemsCount}
@@ -154,7 +156,7 @@ export const OrdersPage: React.FC = () => {
             />
           </div>
           <Select
-            label="Payment Method"
+            label={t('paymentMethodLabel')}
             value={form.paymentMethod}
             onChange={e => setForm({ ...form, paymentMethod: e.target.value })}
             options={[
@@ -166,10 +168,10 @@ export const OrdersPage: React.FC = () => {
           />
           <div className="flex justify-end gap-3 pt-4 border-t border-[#EFF1F6]">
             <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
-              Hủy
+              {t('cancel')}
             </Button>
             <Button type="submit" variant="primary">
-              Lưu Đơn Hàng
+              {t('save')}
             </Button>
           </div>
         </form>

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Trash2, MessageSquare, CheckCheck, Circle, RefreshCw } from 'lucide-react';
 import { useMessages } from '../../application/hooks';
+import { useLanguage } from '../../application/LanguageContext';
 import { Card, Avatar, Button } from '../components/ui';
 
 export const MessagesPage: React.FC = () => {
@@ -14,6 +15,7 @@ export const MessagesPage: React.FC = () => {
     deleteThread,
     refetch,
   } = useMessages();
+  const { t, language } = useLanguage();
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -33,15 +35,15 @@ export const MessagesPage: React.FC = () => {
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm('Bạn có chắc muốn xóa cuộc hội thoại này?')) {
+    if (window.confirm(t('confirmDeleteChat'))) {
       deleteThread(id);
     }
   };
 
   return (
     <Card
-      title="Messages & Customer Support"
-      subtitle="Quản lý và phản hồi tin nhắn trực tiếp với từng người dùng & khách ghé thăm"
+      title={t('messagesSupportTitle')}
+      subtitle={t('messagesSupportSub')}
       action={
         <div className="flex items-center gap-2">
           <Button
@@ -49,7 +51,7 @@ export const MessagesPage: React.FC = () => {
             icon={<RefreshCw className={`w-3.5 h-3.5 text-[#737791] ${loading ? 'animate-spin' : ''}`} />}
             onClick={() => refetch()}
           >
-            Làm mới
+            {t('refresh')}
           </Button>
         </div>
       }
@@ -60,50 +62,50 @@ export const MessagesPage: React.FC = () => {
           <div className="p-3 border-b border-[#EFF1F6] bg-[#FAFBFC] flex items-center justify-between">
             <span className="text-xs font-bold text-[#151D48] flex items-center gap-1.5">
               <MessageSquare className="w-3.5 h-3.5 text-[#5D5FEF]" />
-              Hội thoại ({threads.length})
+              {t('conversations')} ({threads.length})
             </span>
             <span className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
               <Circle className="w-2 h-2 fill-emerald-500 text-emerald-500 animate-pulse" />
-              Live Polling
+              {t('livePolling')}
             </span>
           </div>
 
           {loading && threads.length === 0 ? (
-            <div className="p-8 text-center text-xs text-[#737791]">Đang tải tin nhắn...</div>
+            <div className="p-8 text-center text-xs text-[#737791]">{t('loading')}</div>
           ) : threads.length === 0 ? (
             <div className="p-8 text-center text-xs text-[#737791]">
-              Chưa có tin nhắn nào từ người dùng client.
+              {t('noMessagesYet')}
             </div>
           ) : (
-            threads.map(t => {
-              const isSelected = t.id === activeThreadId;
+            threads.map(tItem => {
+              const isSelected = tItem.id === activeThreadId;
               return (
                 <div
-                  key={t.id}
-                  onClick={() => setActiveThreadId(t.id)}
+                  key={tItem.id}
+                  onClick={() => setActiveThreadId(tItem.id)}
                   className={`p-3.5 border-b border-[#EFF1F6] cursor-pointer flex items-center gap-3 transition-colors group relative ${
                     isSelected ? 'bg-[#F4F5FF]' : 'hover:bg-[#F9FAFB]'
                   }`}
                 >
-                  <Avatar src={t.avatar} name={t.contactName} size="md" isOnline={t.isOnline} />
+                  <Avatar src={tItem.avatar} name={tItem.contactName} size="md" isOnline={tItem.isOnline} />
                   <div className="flex-1 min-w-0 pr-6">
                     <div className="flex justify-between items-baseline mb-0.5">
-                      <span className="text-xs font-bold text-[#151D48] truncate">{t.contactName}</span>
-                      <span className="text-[10px] text-[#A0A4B8] shrink-0 ml-1">{t.timestamp}</span>
+                      <span className="text-xs font-bold text-[#151D48] truncate">{tItem.contactName}</span>
+                      <span className="text-[10px] text-[#A0A4B8] shrink-0 ml-1">{tItem.timestamp}</span>
                     </div>
-                    <p className="text-[11px] text-[#737791] truncate">{t.lastMessage}</p>
+                    <p className="text-[11px] text-[#737791] truncate">{tItem.lastMessage}</p>
                   </div>
 
                   {/* Unread badge & Action */}
                   <div className="absolute right-3 flex items-center gap-1.5">
-                    {t.unreadCount > 0 && (
+                    {tItem.unreadCount > 0 && (
                       <span className="bg-[#5D5FEF] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                        {t.unreadCount}
+                        {tItem.unreadCount}
                       </span>
                     )}
                     <button
-                      onClick={(e) => handleDelete(t.id, e)}
-                      title="Xóa hội thoại"
+                      onClick={(e) => handleDelete(tItem.id, e)}
+                      title={t('deleteConversation')}
                       className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-500 transition-opacity"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -128,11 +130,11 @@ export const MessagesPage: React.FC = () => {
                       <h4 className="text-xs font-bold text-[#151D48]">{activeThread.contactName}</h4>
                       {activeThread.contactEmail ? (
                         <span className="text-[10px] bg-[#5D5FEF]/10 text-[#5D5FEF] px-1.5 py-0.2 rounded font-medium">
-                          Member
+                          {t('memberBadge')}
                         </span>
                       ) : (
                         <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-medium">
-                          Guest
+                          {t('guestBadge')}
                         </span>
                       )}
                     </div>
@@ -146,7 +148,7 @@ export const MessagesPage: React.FC = () => {
                   <button
                     onClick={(e) => handleDelete(activeThread.id, e)}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                    title="Xóa cuộc trò chuyện này"
+                    title={t('deleteConversation')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -158,8 +160,8 @@ export const MessagesPage: React.FC = () => {
                 {messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-xs text-[#737791] space-y-1">
                     <MessageSquare className="w-8 h-8 text-slate-300" />
-                    <span>Chưa có tin nhắn trong cuộc trò chuyện này.</span>
-                    <span className="text-[11px] text-slate-400">Gửi lời chào để bắt đầu hỗ trợ!</span>
+                    <span>{language === 'vi' ? 'Chưa có tin nhắn trong cuộc trò chuyện này.' : 'No messages in this chat yet.'}</span>
+                    <span className="text-[11px] text-slate-400">{language === 'vi' ? 'Gửi lời chào để bắt đầu hỗ trợ!' : 'Say hello to start assisting!'}</span>
                   </div>
                 ) : (
                   messages.map(m => {
@@ -190,20 +192,20 @@ export const MessagesPage: React.FC = () => {
               <form onSubmit={handleSend} className="p-3 bg-white border-t border-[#EFF1F6] flex gap-2">
                 <input
                   type="text"
-                  placeholder="Nhập câu trả lời cho người dùng (Enter để gửi)..."
+                  placeholder={t('typeReplyPlaceholder')}
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   className="flex-1 bg-[#F9FAFB] border border-[#EFF1F6] rounded-xl px-4 py-2.5 text-xs text-[#151D48] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#5D5FEF]/30 focus:border-[#5D5FEF]"
                 />
                 <Button type="submit" variant="primary" size="sm" icon={<Send className="w-4 h-4" />}>
-                  Trả lời
+                  {t('replyBtn')}
                 </Button>
               </form>
             </>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-xs text-[#737791] gap-2">
               <MessageSquare className="w-10 h-10 text-slate-300" />
-              <p>Chọn một cuộc hội thoại từ danh sách bên trái để phản hồi.</p>
+              <p>{t('selectConversationPrompt')}</p>
             </div>
           )}
         </div>

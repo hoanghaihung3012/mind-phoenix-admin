@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
   Trophy,
-  Medal,
   Flame,
   Star,
   Zap,
@@ -11,11 +10,13 @@ import {
   Award,
 } from 'lucide-react';
 import { useLeaderboard } from '../../application/hooks';
+import { useLanguage } from '../../application/LanguageContext';
 import { Card, Table, Avatar, Badge, ProgressBar } from '../components/ui';
 import { LeaderboardUser } from '../../domain/entities';
 
 export const LeaderboardPage: React.FC = () => {
   const { leaderboard, loading } = useLeaderboard();
+  const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredUsers = useMemo(() => {
@@ -56,14 +57,14 @@ export const LeaderboardPage: React.FC = () => {
 
   const columns = [
     {
-      header: 'Thứ hạng',
+      header: t('colRank'),
       accessor: (row: LeaderboardUser) => (
         <div className="flex items-center justify-center">{getRankBadge(row.rank)}</div>
       ),
       className: 'w-20 text-center',
     },
     {
-      header: 'Người dùng / Học viên',
+      header: t('colStudent'),
       accessor: (row: LeaderboardUser) => (
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -89,7 +90,7 @@ export const LeaderboardPage: React.FC = () => {
       ),
     },
     {
-      header: 'Điểm đạt được',
+      header: t('colPoints'),
       accessor: (row: LeaderboardUser) => (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-[#FFF4DE] flex items-center justify-center text-[#FFA800] shrink-0">
@@ -99,15 +100,14 @@ export const LeaderboardPage: React.FC = () => {
             <div className="font-extrabold text-[#151D48] text-base leading-tight">
               {(row.points || 0).toLocaleString()} <span className="text-xs font-semibold text-[#FFA800]">XP</span>
             </div>
-            <div className="text-[10px] text-[#737791]">Điểm tích lũy</div>
+            <div className="text-[10px] text-[#737791]">{language === 'vi' ? 'Điểm tích lũy' : 'Accumulated XP'}</div>
           </div>
         </div>
       ),
     },
     {
-      header: 'Level của user',
+      header: t('colLevel'),
       accessor: (row: LeaderboardUser) => {
-        // Calculate sub-level progress (e.g. remainder of points toward next level)
         const level = row.level || 1;
         const progress = Math.min(100, Math.max(15, (row.points % 1000) / 10));
         return (
@@ -128,28 +128,28 @@ export const LeaderboardPage: React.FC = () => {
       },
     },
     {
-      header: 'Danh hiệu / Huy hiệu',
+      header: language === 'vi' ? 'Danh hiệu' : 'Title & Badge',
       accessor: (row: LeaderboardUser) => (
         <div className="flex items-center gap-1.5 text-xs font-semibold text-[#151D48]">
           <Award className="w-4 h-4 text-[#FFA800] shrink-0" />
-          <span>{row.title || 'Học viên chăm chỉ'}</span>
+          <span>{row.title || (language === 'vi' ? 'Học viên chăm chỉ' : 'Diligent Student')}</span>
         </div>
       ),
     },
     {
-      header: 'Chuỗi học',
+      header: t('colStreak'),
       accessor: (row: LeaderboardUser) => (
         <div className="flex items-center gap-1.5 font-bold text-xs text-[#FA5A7D]">
           <Flame className="w-4 h-4 fill-[#FA5A7D] shrink-0" />
-          <span>{row.streak || 1} ngày</span>
+          <span>{row.streak || 1} {language === 'vi' ? 'ngày' : 'days'}</span>
         </div>
       ),
     },
     {
-      header: 'Trạng thái',
+      header: t('status'),
       accessor: (row: LeaderboardUser) => (
         <Badge variant={getStatusVariant(row.status || '')}>
-          {row.status || 'Đang hoạt động'}
+          {row.status || (language === 'vi' ? 'Đang hoạt động' : 'Active')}
         </Badge>
       ),
     },
@@ -161,9 +161,11 @@ export const LeaderboardPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-[#FFF4DE] to-[#FFE8B8] rounded-[24px] p-5 border border-[#FFE8B8] flex items-center justify-between shadow-sm">
           <div>
-            <span className="text-xs font-semibold text-[#B45309] uppercase tracking-wider">Quán Quân Dẫn Đầu</span>
+            <span className="text-xs font-semibold text-[#B45309] uppercase tracking-wider">
+              {language === 'vi' ? 'Quán Quân Dẫn Đầu' : 'Current Champion'}
+            </span>
             <h3 className="text-xl font-extrabold text-[#151D48] mt-1 truncate max-w-[170px]">
-              {topUser?.name || 'Chưa có'}
+              {topUser?.name || 'N/A'}
             </h3>
             <p className="text-xs text-[#B45309] font-medium mt-0.5">
               Level {topUser?.level || 1} · {(topUser?.points || 0).toLocaleString()} XP
@@ -176,12 +178,14 @@ export const LeaderboardPage: React.FC = () => {
 
         <div className="bg-white rounded-[24px] p-5 border border-[#EFF1F6] flex items-center justify-between shadow-sm">
           <div>
-            <span className="text-xs font-semibold text-[#737791] uppercase tracking-wider">Tổng Điểm Tích Lũy</span>
+            <span className="text-xs font-semibold text-[#737791] uppercase tracking-wider">
+              {language === 'vi' ? 'Tổng Điểm Tích Lũy' : 'Total XP Earned'}
+            </span>
             <h3 className="text-2xl font-extrabold text-[#151D48] mt-1">
               {totalPoints.toLocaleString()} <span className="text-xs font-bold text-[#FFA800]">XP</span>
             </h3>
             <p className="text-xs text-[#00E096] font-semibold mt-0.5 flex items-center gap-1">
-              <Zap className="w-3.5 h-3.5" /> Toàn hệ thống
+              <Zap className="w-3.5 h-3.5" /> {language === 'vi' ? 'Toàn hệ thống' : 'Platform-wide'}
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#FFF4DE] flex items-center justify-center text-[#FFA800]">
@@ -191,12 +195,14 @@ export const LeaderboardPage: React.FC = () => {
 
         <div className="bg-white rounded-[24px] p-5 border border-[#EFF1F6] flex items-center justify-between shadow-sm">
           <div>
-            <span className="text-xs font-semibold text-[#737791] uppercase tracking-wider">Level Cao Nhất</span>
+            <span className="text-xs font-semibold text-[#737791] uppercase tracking-wider">
+              {language === 'vi' ? 'Level Cao Nhất' : 'Highest Level'}
+            </span>
             <h3 className="text-2xl font-extrabold text-[#5D5FEF] mt-1">
               Level {highestLevel}
             </h3>
             <p className="text-xs text-[#737791] font-medium mt-0.5">
-              Hạng Bậc Phượng Hoàng
+              {language === 'vi' ? 'Hạng Bậc Phượng Hoàng' : 'Phoenix Tier Rank'}
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#F4F5FF] flex items-center justify-center text-[#5D5FEF]">
@@ -206,13 +212,15 @@ export const LeaderboardPage: React.FC = () => {
 
         <div className="bg-white rounded-[24px] p-5 border border-[#EFF1F6] flex items-center justify-between shadow-sm">
           <div>
-            <span className="text-xs font-semibold text-[#737791] uppercase tracking-wider">Chuỗi Kỷ Lục</span>
+            <span className="text-xs font-semibold text-[#737791] uppercase tracking-wider">
+              {language === 'vi' ? 'Chuỗi Kỷ Lục' : 'Longest Streak'}
+            </span>
             <h3 className="text-2xl font-extrabold text-[#FA5A7D] mt-1 flex items-center gap-1.5">
               <Flame className="w-6 h-6 fill-[#FA5A7D]" />
-              {topStreak} <span className="text-sm font-semibold">ngày</span>
+              {topStreak} <span className="text-sm font-semibold">{language === 'vi' ? 'ngày' : 'days'}</span>
             </h3>
             <p className="text-xs text-[#737791] font-medium mt-0.5">
-              Học tập không gián đoạn
+              {language === 'vi' ? 'Học tập không gián đoạn' : 'Unbroken daily study'}
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#FFE2E5] flex items-center justify-center text-[#FA5A7D]">
@@ -243,12 +251,12 @@ export const LeaderboardPage: React.FC = () => {
             </div>
             <div className="mt-5 pt-4 border-t border-[#EFF1F6] flex items-center justify-around">
               <div>
-                <div className="text-[11px] text-[#737791] font-medium">Điểm đạt được</div>
+                <div className="text-[11px] text-[#737791] font-medium">{t('colPoints')}</div>
                 <div className="text-lg font-extrabold text-[#151D48]">{leaderboard[1].points.toLocaleString()} XP</div>
               </div>
               <div className="w-[1px] h-8 bg-[#EFF1F6]" />
               <div>
-                <div className="text-[11px] text-[#737791] font-medium">Level</div>
+                <div className="text-[11px] text-[#737791] font-medium">{t('colLevel')}</div>
                 <div className="text-lg font-extrabold text-[#5D5FEF]">Lv. {leaderboard[1].level}</div>
               </div>
             </div>
@@ -267,7 +275,7 @@ export const LeaderboardPage: React.FC = () => {
                 />
               </div>
               <span className="text-[10px] uppercase tracking-wider font-extrabold bg-[#F59E0B] text-white px-3 py-0.5 rounded-full shadow-sm">
-                QUÁN QUÂN BẢNG VÀNG
+                {language === 'vi' ? 'QUÁN QUÂN BẢNG VÀNG' : 'CHAMPION HALL OF FAME'}
               </span>
               <h4 className="font-extrabold text-[#151D48] text-lg mt-2">{leaderboard[0].name}</h4>
               <p className="text-xs text-[#B45309] font-medium mt-0.5">{leaderboard[0].school || 'MindPhoenix Academy'}</p>
@@ -277,12 +285,12 @@ export const LeaderboardPage: React.FC = () => {
             </div>
             <div className="mt-5 pt-4 border-t border-[#FDE68A] flex items-center justify-around bg-white/80 rounded-2xl p-2 shadow-inner">
               <div>
-                <div className="text-[11px] text-[#737791] font-medium">Điểm đạt được</div>
+                <div className="text-[11px] text-[#737791] font-medium">{t('colPoints')}</div>
                 <div className="text-xl font-black text-[#D97706]">{leaderboard[0].points.toLocaleString()} XP</div>
               </div>
               <div className="w-[1px] h-8 bg-[#FDE68A]" />
               <div>
-                <div className="text-[11px] text-[#737791] font-medium">Level</div>
+                <div className="text-[11px] text-[#737791] font-medium">{t('colLevel')}</div>
                 <div className="text-xl font-black text-[#5D5FEF]">Lv. {leaderboard[0].level}</div>
               </div>
             </div>
@@ -307,12 +315,12 @@ export const LeaderboardPage: React.FC = () => {
             </div>
             <div className="mt-5 pt-4 border-t border-[#EFF1F6] flex items-center justify-around">
               <div>
-                <div className="text-[11px] text-[#737791] font-medium">Điểm đạt được</div>
+                <div className="text-[11px] text-[#737791] font-medium">{t('colPoints')}</div>
                 <div className="text-lg font-extrabold text-[#151D48]">{leaderboard[2].points.toLocaleString()} XP</div>
               </div>
               <div className="w-[1px] h-8 bg-[#EFF1F6]" />
               <div>
-                <div className="text-[11px] text-[#737791] font-medium">Level</div>
+                <div className="text-[11px] text-[#737791] font-medium">{t('colLevel')}</div>
                 <div className="text-lg font-extrabold text-[#5D5FEF]">Lv. {leaderboard[2].level}</div>
               </div>
             </div>
@@ -322,15 +330,15 @@ export const LeaderboardPage: React.FC = () => {
 
       {/* Main Leaderboard Table Card */}
       <Card
-        title="Bảng Xếp Hạng Chi Tiết"
-        subtitle="Danh sách học viên theo điểm số tích lũy và cấp độ thành tích"
+        title={t('leaderboardTitle')}
+        subtitle={t('leaderboardSub')}
         action={
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="w-4 h-4 text-[#737791] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Tìm kiếm theo tên, trường..."
+                placeholder={t('searchStudentPlaceholder')}
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="pl-9 pr-3.5 py-1.5 text-xs bg-[#F9FAFB] border border-[#EFF1F6] rounded-xl text-[#151D48] placeholder-[#737791] focus:outline-none focus:border-[#5D5FEF] w-56 transition-colors"
@@ -338,7 +346,7 @@ export const LeaderboardPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-1.5 text-xs font-semibold text-[#5D5FEF] bg-[#F4F5FF] px-3 py-1.5 rounded-xl shrink-0">
               <Users className="w-4 h-4" />
-              <span>{filteredUsers.length} Thành viên</span>
+              <span>{filteredUsers.length} {language === 'vi' ? 'Thành viên' : 'Members'}</span>
             </div>
           </div>
         }
@@ -346,14 +354,14 @@ export const LeaderboardPage: React.FC = () => {
         {loading && leaderboard.length === 0 ? (
           <div className="py-16 text-center text-sm text-[#737791] flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-3 border-[#5D5FEF] border-t-transparent rounded-full animate-spin" />
-            <span>Đang tải bảng xếp hạng...</span>
+            <span>{t('loading')}</span>
           </div>
         ) : (
           <Table
             columns={columns}
             data={filteredUsers}
             keyExtractor={l => l.id}
-            emptyMessage="Không tìm thấy thành viên phù hợp với từ khóa"
+            emptyMessage={language === 'vi' ? 'Không tìm thấy thành viên phù hợp với từ khóa' : 'No students matching your search'}
           />
         )}
       </Card>

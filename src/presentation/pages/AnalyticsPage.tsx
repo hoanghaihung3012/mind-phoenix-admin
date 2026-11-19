@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Users,
   Activity,
@@ -8,29 +8,27 @@ import {
   RefreshCw,
   Clock,
   Compass,
-  Monitor,
-  Flame,
-  Award,
   Circle,
   Sparkles,
 } from 'lucide-react';
 import { useAnalytics } from '../../application/hooks';
+import { useLanguage } from '../../application/LanguageContext';
 import { Card, StatCard, Button, ProgressBar } from '../components/ui';
 
 export const AnalyticsPage: React.FC = () => {
   const { summary, loading, refetch } = useAnalytics(8000); // Poll every 8s
-  const [activeFilter, setActiveFilter] = useState<'all' | 'games' | 'tools' | 'scores'>('all');
+  const { t, language } = useLanguage();
 
   const formatTimeAgo = (isoString?: string) => {
-    if (!isoString) return 'Vừa xong';
+    if (!isoString) return t('justNow');
     const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
-    if (diff < 10) return 'Vừa xong';
-    if (diff < 60) return `${diff} giây trước`;
+    if (diff < 10) return t('justNow');
+    if (diff < 60) return `${diff} ${t('secondsAgo')}`;
     const mins = Math.floor(diff / 60);
-    if (mins < 60) return `${mins} phút trước`;
+    if (mins < 60) return `${mins} ${t('minutesAgo')}`;
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} giờ trước`;
-    return `${Math.floor(hours / 24)} ngày trước`;
+    if (hours < 24) return `${hours} ${t('hoursAgo')}`;
+    return `${Math.floor(hours / 24)} ${t('daysAgo')}`;
   };
 
   const totalGamePlays = summary?.totalGamePlays || 0;
@@ -46,14 +44,14 @@ export const AnalyticsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-[#F8F9FA] shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-[#151D48]">User & Client Analytics</h1>
+            <h1 className="text-xl font-bold text-[#151D48]">{t('analyticsTitle')}</h1>
             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Real-time Live
+              {t('realtimeLive')}
             </span>
           </div>
           <p className="text-xs text-[#737791] mt-1">
-            Theo dõi người dùng online, lượt tương tác minigame, công cụ lớp học và kỷ lục điểm số client.
+            {t('analyticsSubtitle')}
           </p>
         </div>
 
@@ -63,7 +61,7 @@ export const AnalyticsPage: React.FC = () => {
             icon={<RefreshCw className={`w-4 h-4 text-[#737791] ${loading ? 'animate-spin' : ''}`} />}
             onClick={() => refetch()}
           >
-            Làm mới
+            {t('refresh')}
           </Button>
         </div>
       </div>
@@ -74,40 +72,40 @@ export const AnalyticsPage: React.FC = () => {
           variant="purple"
           icon={<Users className="w-5 h-5" />}
           value={String(summary?.totalUsers || 0)}
-          title="Tổng User Hệ Thống"
-          change="Tài khoản đăng ký"
+          title={t('totalSystemUsers')}
+          change={t('registeredAccounts')}
         />
         <StatCard
           variant="green"
           icon={<Activity className="w-5 h-5" />}
           value={String(summary?.onlineUsers || 0)}
-          title="Người Dùng Đang Online"
-          change={`${summary?.onlineMembers || 0} thành viên · ${summary?.onlineGuests || 0} khách`}
+          title={t('usersOnlineNow')}
+          change={`${summary?.onlineMembers || 0} ${t('memberBadge')} · ${summary?.onlineGuests || 0} ${t('guestBadge')}`}
         />
         <StatCard
           variant="pink"
           icon={<Gamepad2 className="w-5 h-5" />}
           value={String(totalGamePlays)}
-          title="Lượt Chơi Minigame"
-          change={`${summary?.topGames?.length || 0} tựa game tương tác`}
+          title={t('minigamePlays')}
+          change={`${summary?.topGames?.length || 0} ${t('interactiveGames')}`}
         />
         <StatCard
           variant="orange"
           icon={<Wrench className="w-5 h-5" />}
           value={String(totalToolUsages)}
-          title="Lượt Dùng Công Cụ"
-          change="Tiện ích & Sandbox lớp học"
+          title={t('toolUsages')}
+          change={t('toolsClassroom')}
         />
       </div>
 
       {/* Live Online Users Table */}
       <Card
-        title="Danh Sách Người Dùng & Khách Đang Online"
-        subtitle={`Hiện có ${summary?.onlineUsers || 0} phiên truy cập hoạt động trong 90 giây qua`}
+        title={t('onlineSessionsTitle')}
+        subtitle={`${summary?.onlineUsers || 0} ${t('onlineSessionsSub')}`}
         action={
           <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
             <Circle className="w-2.5 h-2.5 fill-emerald-500 text-emerald-500 animate-pulse" />
-            Tự động cập nhật mỗi 8s
+            {t('autoRefreshEvery')}
           </div>
         }
       >
@@ -115,18 +113,18 @@ export const AnalyticsPage: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#F8F9FA] text-[11px] font-bold text-[#737791] uppercase tracking-wider">
-                <th className="py-3 px-3">Người dùng / Thiết bị</th>
-                <th className="py-3 px-3">Vai trò</th>
-                <th className="py-3 px-3">Trang đang mở</th>
-                <th className="py-3 px-3">Hoạt động thời gian thực</th>
-                <th className="py-3 px-3 text-right">Hoạt động gần nhất</th>
+                <th className="py-3 px-3">{t('colUserDevice')}</th>
+                <th className="py-3 px-3">{t('colRole')}</th>
+                <th className="py-3 px-3">{t('colCurrentPage')}</th>
+                <th className="py-3 px-3">{t('colRealtimeActivity')}</th>
+                <th className="py-3 px-3 text-right">{t('colLastActive')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F8F9FA] text-xs">
               {(summary?.activeSessions || []).length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-8 text-center text-[#737791]">
-                    Chưa có người dùng trực tuyến trong 90 giây qua. Mở website client để xem live session!
+                    {t('noActiveSessions')}
                   </td>
                 </tr>
               ) : (
@@ -144,10 +142,10 @@ export const AnalyticsPage: React.FC = () => {
                         </div>
                         <div>
                           <div className="font-semibold text-[#151D48] flex items-center gap-1.5">
-                            {sess.userName || 'Khách vãng lai'}
+                            {sess.userName || t('guestBadge')}
                             {sess.userId && (
                               <span className="text-[10px] bg-[#5D5FEF]/10 text-[#5D5FEF] px-1.5 py-0.2 rounded font-medium">
-                                Member
+                                {t('memberBadge')}
                               </span>
                             )}
                           </div>
@@ -159,7 +157,7 @@ export const AnalyticsPage: React.FC = () => {
                     </td>
                     <td className="py-3 px-3">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#F4F5F7] text-[#444A6D]">
-                        {sess.role || (sess.userId ? 'Học viên' : 'Khách vãng lai')}
+                        {sess.role || (sess.userId ? (language === 'vi' ? 'Học viên' : 'Student') : t('guestBadge'))}
                       </span>
                     </td>
                     <td className="py-3 px-3">
@@ -170,7 +168,7 @@ export const AnalyticsPage: React.FC = () => {
                     </td>
                     <td className="py-3 px-3">
                       <span className="font-medium text-[#151D48] bg-amber-50 text-amber-800 border border-amber-200/60 px-2 py-0.5 rounded-md text-[11px]">
-                        {sess.currentActivity || 'Đang khám phá website'}
+                        {sess.currentActivity || (language === 'vi' ? 'Đang khám phá website' : 'Exploring website')}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-right text-[#737791] font-medium">
@@ -191,12 +189,12 @@ export const AnalyticsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Played Games */}
         <Card
-          title="Top Game Được Chơi Nhiều Nhất"
-          subtitle="Xếp hạng dựa trên lượt chơi và tương tác minigame của học sinh"
+          title={t('topGamesRanking')}
+          subtitle={t('topGamesSub')}
           action={
             <div className="p-1 bg-[#F4F5F7] rounded-xl flex items-center text-xs">
               <span className="px-2.5 py-1 rounded-lg bg-white shadow-xs font-semibold text-[#151D48]">
-                {summary?.topGames.length || 0} Trò chơi
+                {summary?.topGames.length || 0} {language === 'vi' ? 'Trò chơi' : 'Games'}
               </span>
             </div>
           }
@@ -217,13 +215,13 @@ export const AnalyticsPage: React.FC = () => {
                       <span className="font-bold text-[#151D48]">{game.title}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[#737791]">
-                      <span className="font-bold text-[#151D48]">{game.playCount}</span> lượt chơi
+                      <span className="font-bold text-[#151D48]">{game.playCount}</span> {language === 'vi' ? 'lượt chơi' : 'plays'}
                     </div>
                   </div>
                   <ProgressBar value={pct} color={color} height="h-2" />
                   <div className="flex justify-between text-[10px] text-[#A0A4A8]">
-                    <span>Tỷ lệ quan tâm: {pct}%</span>
-                    <span>Chơi gần nhất: {formatTimeAgo(game.lastPlayedAt)}</span>
+                    <span>{t('interestRate')}: {pct}%</span>
+                    <span>{t('lastPlayed')}: {formatTimeAgo(game.lastPlayedAt)}</span>
                   </div>
                 </div>
               );
@@ -233,12 +231,12 @@ export const AnalyticsPage: React.FC = () => {
 
         {/* Top Tools Used */}
         <Card
-          title="Top Công Cụ Trợ Giảng & Học Tập"
-          subtitle="Số lần giáo viên và học sinh mở các công cụ tương tác"
+          title={t('topToolsRanking')}
+          subtitle={t('topToolsSub')}
           action={
             <div className="p-1 bg-[#F4F5F7] rounded-xl flex items-center text-xs">
               <span className="px-2.5 py-1 rounded-lg bg-white shadow-xs font-semibold text-[#151D48]">
-                {summary?.topTools.length || 0} Công cụ
+                {summary?.topTools.length || 0} {language === 'vi' ? 'Công cụ' : 'Tools'}
               </span>
             </div>
           }
@@ -259,13 +257,13 @@ export const AnalyticsPage: React.FC = () => {
                       <span className="font-bold text-[#151D48]">{tool.title}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[#737791]">
-                      <span className="font-bold text-[#151D48]">{tool.usageCount}</span> lần dùng
+                      <span className="font-bold text-[#151D48]">{tool.usageCount}</span> {language === 'vi' ? 'lần dùng' : 'times'}
                     </div>
                   </div>
                   <ProgressBar value={pct} color={color} height="h-2" />
                   <div className="flex justify-between text-[10px] text-[#A0A4A8]">
-                    <span>Tỷ lệ sử dụng: {pct}%</span>
-                    <span>Dùng gần nhất: {formatTimeAgo(tool.lastUsedAt)}</span>
+                    <span>{t('usageRate')}: {pct}%</span>
+                    <span>{t('lastUsed')}: {formatTimeAgo(tool.lastUsedAt)}</span>
                   </div>
                 </div>
               );
@@ -278,8 +276,8 @@ export const AnalyticsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Scores */}
         <Card
-          title="Bảng Vàng Điểm Cao (Top Game Scores)"
-          subtitle="Kỷ lục điểm số cao nhất của các minigame được ghi nhận"
+          title={t('hallOfFame')}
+          subtitle={t('hallOfFameSub')}
           action={
             <div className="flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
               <Trophy className="w-3.5 h-3.5" />
@@ -291,10 +289,10 @@ export const AnalyticsPage: React.FC = () => {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-[#F8F9FA] text-[11px] font-bold text-[#737791] uppercase">
-                  <th className="py-2.5 px-2">Hạng</th>
-                  <th className="py-2.5 px-2">Người chơi</th>
-                  <th className="py-2.5 px-2">Tựa Game</th>
-                  <th className="py-2.5 px-2 text-right">Điểm số</th>
+                  <th className="py-2.5 px-2">{t('rankCol')}</th>
+                  <th className="py-2.5 px-2">{t('playerCol')}</th>
+                  <th className="py-2.5 px-2">{t('gameCol')}</th>
+                  <th className="py-2.5 px-2 text-right">{t('scoreCol')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F8F9FA]">
@@ -345,8 +343,8 @@ export const AnalyticsPage: React.FC = () => {
 
         {/* Recent Client Activities Feed */}
         <Card
-          title="Nhật Ký Tương Tác Thời Gian Thực"
-          subtitle="Dòng sự kiện hoạt động của người dùng trên toàn bộ client"
+          title={t('activityStream')}
+          subtitle={t('activityStreamSub')}
           action={
             <span className="text-xs bg-[#5D5FEF]/10 text-[#5D5FEF] px-2.5 py-1 rounded-lg font-medium flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" />
@@ -389,19 +387,21 @@ export const AnalyticsPage: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-[#151D48]">
-                        {act.userName || 'Khách vãng lai'}
+                        {act.userName || t('guestBadge')}
                         <span className="font-normal text-[#737791]">
                           {isScore
-                            ? ` vừa đạt `
+                            ? (language === 'vi' ? ' vừa đạt ' : ' just scored ')
                             : isGame
-                            ? ` vừa chơi game `
+                            ? (language === 'vi' ? ' vừa chơi game ' : ' just played ')
                             : isTool
-                            ? ` vừa dùng công cụ `
-                            : ` đã xem `}
+                            ? (language === 'vi' ? ' vừa dùng công cụ ' : ' just used tool ')
+                            : (language === 'vi' ? ' đã xem ' : ' viewed ')}
                         </span>
                         <span className="font-semibold text-[#5D5FEF]">{act.targetTitle}</span>
                         {isScore && act.score ? (
-                          <span className="font-bold text-amber-600 ml-1">({act.score} điểm)</span>
+                          <span className="font-bold text-amber-600 ml-1">
+                            ({act.score} {language === 'vi' ? 'điểm' : 'pts'})
+                          </span>
                         ) : null}
                       </div>
                       <span className="text-[10px] text-[#A0A4A8]">{formatTimeAgo(act.createdAt)}</span>

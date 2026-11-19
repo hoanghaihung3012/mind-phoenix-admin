@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from '../../../application/AuthContext';
+import { useLanguage } from '../../../application/LanguageContext';
 
 interface SidebarProps {
   activeTab: string;
@@ -29,22 +30,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onClose,
 }) => {
   const { logout } = useAuth();
+  const { t } = useLanguage();
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { id: 'analytics', label: 'User & Analytics', icon: <Activity className="w-5 h-5" /> },
-    { id: 'leaderboard', label: 'Leaderboard', icon: <Trophy className="w-5 h-5" /> },
-    { id: 'orders', label: 'Order', icon: <ShoppingCart className="w-5 h-5" /> },
-    { id: 'products', label: 'Products', icon: <ShoppingBag className="w-5 h-5" /> },
-    { id: 'contacts', label: 'Khách hàng liên hệ', icon: <Inbox className="w-5 h-5" /> },
-    { id: 'messages', label: 'Messages', icon: <MessageSquare className="w-5 h-5" /> },
-    { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> },
+    { id: 'dashboard', label: t('menuDashboard'), icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: 'analytics', label: t('menuAnalytics'), icon: <Activity className="w-5 h-5" /> },
+    { id: 'leaderboard', label: t('menuLeaderboard'), icon: <Trophy className="w-5 h-5" /> },
+    { id: 'orders', label: t('menuOrders'), icon: <ShoppingCart className="w-5 h-5" /> },
+    { id: 'products', label: t('menuProducts'), icon: <ShoppingBag className="w-5 h-5" /> },
+    { id: 'contacts', label: t('menuContacts'), icon: <Inbox className="w-5 h-5" /> },
+    { id: 'messages', label: t('menuMessages'), icon: <MessageSquare className="w-5 h-5" /> },
+    { id: 'settings', label: t('menuSettings'), icon: <Settings className="w-5 h-5" /> },
   ];
 
   const handleSelectTab = (id: string) => {
     setActiveTab(id);
     if (onClose) {
       onClose();
+    }
+  };
+
+  const handleLogout = () => {
+    if (window.confirm(t('logoutConfirm'))) {
+      logout();
     }
   };
 
@@ -78,9 +86,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Flame className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-[#151D48] tracking-tight">MindPhoenix</h1>
+                <h1 className="text-xl font-bold text-[#151D48] tracking-tight">{t('brandTitle')}</h1>
                 <span className="text-[10px] uppercase font-bold text-[#5D5FEF] bg-[#5D5FEF]/10 px-1.5 py-0.5 rounded tracking-wider">
-                  Admin Portal
+                  {t('adminPortal')}
                 </span>
               </div>
             </div>
@@ -91,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 type="button"
                 onClick={onClose}
                 className="p-1.5 rounded-xl text-[#737791] hover:text-[#151D48] hover:bg-[#F9FAFB] lg:hidden"
-                aria-label="Đóng menu"
+                aria-label={t('close')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -131,17 +139,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <h4 className="text-sm font-bold tracking-tight">MindPhoenix Admin</h4>
             <p className="text-[11px] text-white/80 mt-0.5">
-              Admin: <span className="font-bold underline">hhh</span>
+              {t('adminRole')}: <span className="font-bold underline">hhh</span>
             </p>
           </div>
 
           {/* Sign Out */}
           <button
-            onClick={logout}
-            className="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-semibold text-[#FA5A7D] hover:bg-[#FFE2E5]/50 transition-colors"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-semibold text-[#FA5A7D] hover:bg-[#FFE2E5]/50 transition-colors cursor-pointer"
           >
             <LogOut className="w-5 h-5 shrink-0" />
-            <span>Sign Out</span>
+            <span>{t('menuLogout')}</span>
           </button>
         </div>
       </aside>
